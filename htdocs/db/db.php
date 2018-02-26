@@ -1,5 +1,8 @@
 <?php
-include ('db_info.php');
+include_once __DIR__ . '/db_info.php';
+include_once __DIR__ . '/queries.php';
+include_once __DIR__ . '/insertupdate.php';
+
 $DATABASE = NULL;
 function DB() {
 	global $DATABASE, $HOST, $PORT, $DBNAME, $USER, $PASSWORD;
@@ -10,31 +13,19 @@ function DB() {
 	 return $DATABASE;
 }
 
-function parse_form ($post) {
-	print_r($post);
-	$keys = [];
-	$values = [];
-	foreach($post as $key => $value) {
-		if ($key === "submit") continue;
-		$keys[] = $key;
-		$values[] = $value;
+function execute_sql_params ($query_name, $params=[]) {
+	global $QUERIES;
+	try {
+		$result = pg_query_params(DB(), $QUERIES[$query_name], $params);
+		if (!$result) {
+			echo "Something Went Wrong!";
+			return NULL;
+		} else {
+			return $result;
+		}
+	} catch (Exception $e) {
+		echo e;
 	}
-
-
-	$keys = implode(",", $keys);
-	$values = implode(",", $values);
-	$table = "Users";
-	$sql = "INSERT INTO " . $table . " (" . $keys . ") VALUES (" . $values . ")";
-	echo $sql;
-	// var input = {};
-	// for (var i = 0; i < elements.length; i++) {
-	// 	input[elements[i].name] = elements[i].value;
-	// }
-	// delete input[''];
-	// keys = Object.keys(input).join(",")
-	// values = Object.values(input).join(",")
-	// var sql = "INSERT INTO " + table + " (" + keys + ") VALUES (" + values + ")";
-
-	// return sql
 }
+
 ?>

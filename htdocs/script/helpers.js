@@ -14,3 +14,40 @@ function createOnSubmit (table) {
 		return true;
 	}
 }
+
+function makeRetrievedOnClick (link, ids) {
+	return function (table) {
+		return function (rowno) {
+			while (table != null && table.nodeName !== "TABLE")
+				table = table.parentElement;
+
+			var columns = []
+			for (var i = 0; i < table.rows[0].cells.length; i++) {
+				if (ids.includes(table.rows[0].cells[i].innerHTML.trim())) {
+					columns.push(i);
+				}
+			}
+
+			var params = []
+			for (var i = 0; i < columns.length; i++) {
+				params.push(table.rows[rowno].cells[columns[i]].innerHTML.trim());
+			}
+
+			var form = document.createElement("form");
+			form.action = link;
+			form.method = "post";
+			form.style.display = "none";
+			var submit = document.createElement("input");
+			submit.type = "submit";
+			submit.name = "update";
+			var key = document.createElement("input");
+			key.type = "hidden";
+			key.name = "key";
+			key.value = encodeURIComponent(params.join(","));
+			form.appendChild(key);
+			form.appendChild(submit);
+			document.body.appendChild(form);
+			form.submit()
+		}
+	}
+}
