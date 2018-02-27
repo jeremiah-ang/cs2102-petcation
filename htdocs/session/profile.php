@@ -21,12 +21,14 @@ $username = get_username();
 			<th>Full Name</th>
 			<th>Date of birth</th>
 			<th>Address</th>
+			<th>Wallet</th>
 		</tr>
 		<tr>
 			<td><?= $user['userid'] ?></td>
 			<td><?= $user['username'] ?></td>
 			<td><?= $user['dateofbirth'] ?></td>
 			<td><?= $user['address'] ?></td>
+			<td><?= $user['credits'] ?></td>
 		</tr>
 	</table>
 

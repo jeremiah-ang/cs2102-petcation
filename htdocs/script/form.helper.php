@@ -24,8 +24,9 @@ function make_values ($key, $query_name) {
 	return $values;
 }
 function get_next_id ($query_name, $username=NULL) {
-	$cursor = execute_sql_params($query_name, (is_null($username)) ? [] : [$username]);
-	return pg_fetch_assoc($cursor)['next'];
+	return -1;
+	// $cursor = execute_sql_params($query_name, (is_null($username)) ? [] : [$username]);
+	// return pg_fetch_assoc($cursor)['next'];
 }
 function get_petids ($username) {
 	$cursor = execute_sql_params("select pets of user", [$username]);

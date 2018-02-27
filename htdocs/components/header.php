@@ -11,6 +11,7 @@ if (isset($_SESSION['username'])) {
 } else {
 ?>
 	<a href="/petcation/session/login.php"> Login </a>
+	<a href="/petcation/create/users.create.php"> Register </a>
 <?php
 }
 ?>

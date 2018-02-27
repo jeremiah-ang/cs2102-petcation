@@ -20,14 +20,13 @@ $FORMS = [
 		["Address", "textarea", "text", "address", ""]
 	],
 	"pets" => [
-		["Pet Id", "input", "text", "petid", "petid", ["readonly = 'readonly'"]],
+		["Pet Id", "input", "hidden", "petid", "petid", ["readonly = 'readonly'"]],
 		["Owner User Id", "input", "text", "userid", "userid", ["readonly = 'readonly'"]],
 		["Name", "input", "text", "petname", ""],
 		["Size", "input", "text", "sizeofpet", ""],
 		["Picture", "input", "text", "picture", ""]
 	],
 	"bids" => [
-		["Bid Id", "input", "text", "bidid", "bidid", ["readonly = 'readonly'"]],
 		["Buyer Id", "input", "text", "buyerid", "buyerid", ["readonly = 'readonly'"]],
 		["Seller Id", "input", "text", "sellerid", "sellerid", ["readonly = 'readonly'"]],
 		["Service Id", "input", "text", "serviceid", "serviceid", ["readonly = 'readonly'"]],
@@ -35,17 +34,16 @@ $FORMS = [
 		["Amount", "input", "number", "amount", "", ["min = '1'"]]
 	],
 	"trans" => [
-		["Trans Id", "input", "text", "bidid", ""],
+		["Trans Id", "input", "hidden", "bidid", ""],
 		["User Id", "input", "text", "buyerid", ""],
-		["Trans Date", "input", "text", "petid", ""],
+		["Trans Date", "input", "text", "petid", "DEFAULT"],
 		["Trans Type", "input", "text", "sellerid", ""],
 		["Trans Amount", "input", "text", "serviceid", ""]
 	],
 	"wallet" => [
-		["Topup Id", "input", "text", "topupid", "topupid", ["readonly = 'readonly'"]],
+		["Topup Id", "input", "hidden", "topupid", "topupid", ["readonly = 'readonly'"]],
 		["User Id", "input", "text", "userid", "userid", ["readonly = 'readonly'"]],
-		["Amount", "input", "text", "amount", ""],
-		["Time Date", "input", "text", "timedate", "timedate", ["readonly = 'readonly'"]]
+		["Amount", "input", "text", "amount", ""]
 	],
 	"winners" => [
 		["Buyer Id", "input", "text", "buyerid", ""],
@@ -55,7 +53,7 @@ $FORMS = [
 		["Amount", "input", "text", "amount", ""]
 	],
 	"service" => [
-		["Service Id", "input", "text", "serviceid", "serviceid", ["readonly = 'readonly'"]],
+		["Service Id", "input", "hidden", "serviceid", "serviceid", ["readonly = 'readonly'"]],
 		["Seller Id", "input", "text", "userid", "userid", ["readonly = 'readonly'"]],
 		["Start Date", "input", "text", "startdate", ""],
 		["End Date", "input", "text", "enddate", ""]
@@ -66,6 +64,7 @@ function CREATE_TABLE ($crud, $tablename, $values=[], $attrs=[], $method="POST",
 	global $FORMS;
 	$fieldsOption = $FORMS[$tablename];
 
+	$hidden = "";
 	$fields = "";
 	foreach ($fieldsOption as $options) {
 		$label = $options[0];
@@ -79,14 +78,15 @@ function CREATE_TABLE ($crud, $tablename, $values=[], $attrs=[], $method="POST",
 		$attr = make_attr($crud, $tablename, $name, $createAttr, $updateAttr, $attrs);
 		$field = make_field($tagname, $type, $name, $value, $attr);
 		if ($type === "hidden") {
-			$form .= $field;
+			$hidden .= $field;
+		} else {
+			lilabel ($label, $field);
+			$fields .= $field;
 		}
-
-		lilabel ($label, $field);
-		$fields .= $field;
+		
 	}
 	ul($fields);
-	make_form($fields, $crud, $tablename, $method, $formname, $action);
+	make_form($fields, $hidden, $crud, $tablename, $method, $formname, $action);
 
 	return $fields;
 }
@@ -114,11 +114,12 @@ function make_attr ($crud, $tablename, $name, $createAttr, $updateAttr, $attrs) 
 	return implode(" ", $target);
 }
 
-function make_form (&$fields, $crud, $tablename, $method, $formname=NULL, $action=NULL) {
+function make_form (&$fields, $hidden, $crud, $tablename, $method, $formname=NULL, $action=NULL) {
 	$formname = (is_null($formname)) ? $crud . $tablename : $formname;
 	$action = (is_null($action)) ? "" : "action='$action'";
 	$form = "<form name='$formname' method='$method' $action onsubmit='return formOnSubmit(this);'> ";
 	$form .= "<input type='hidden' name='table' value='$tablename'></input>";
+	$form .= $hidden;
 	$fields = $form . $fields . "<input type='submit' name='$crud'></input></form>";
 }
 
