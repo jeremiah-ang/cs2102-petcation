@@ -1,51 +1,25 @@
 <?php
 session_start();
 require_once __DIR__ . "/../db/db.php";
+require_once __DIR__ . "/../db/forms.php";
+require_once __DIR__ . "/../components/header.php";
+include_once __DIR__ . "/session.helper.php";
+include_once __DIR__ . "/form.helper.php";
 
-function has_submit_key ($post) {
-	return isset($post['submit']);
+function extract_page_info ($filename) {
+	$op = explode(".", basename($filename, ".php"));
+	$title = ucwords($op[1] . " " . $op[0]);
+	$op[] = $title;
+	return $op;
 }
 
-function has_update_key ($post) {
-	return isset($post['key']);
-}
-function get_update_key ($post) {
-	return explode(",", rawurldecode($post['key']));
-}
+function gettitle($page_info) { return (count($page_info) == 4) ? $page_info[3] : $page_info[2]; }
+function gettablename($page_info) { return $page_info[0]; }
+function getcrud($page_info) { return $page_info[1]; }
+function getextra($page_info) { return (count($page_info) == 4) ? ".".$page_info[2] : ""; }
 
-function retrieve_row ($query_name, $params) {
-	$cursor = execute_sql_params($query_name, $params);
-	return pg_fetch_assoc($cursor);
-}
-
-function retrieve_table ($query_name, 
-						$update_fn="updateOnClick(this)", 
-						$delete_fn="deleteOnClick(this)") {
-	$cursor = execute_sql_params($query_name);
-	$keyed = false;
-	$row_no = 1;
-	echo "<table id='retrievedTable'>";
-	while ($row = pg_fetch_assoc($cursor)) {
-		if (!$keyed) {
-			echo "<tr>";
-			foreach ($row as $key => $value) {
-				echo "<th>" . $key . "</th>";
-			}
-			echo "<th> Update </th><th> Delete </th>";
-			echo "</tr>";
-			$keyed = true;
-		}
-
-		echo "<tr>";
-		foreach ($row as $key => $value) {
-			echo "<td>" . $value . "</td>";
-		}
-		echo "<td><a href='pleaseEnableJavascript.html' onclick='$update_fn(".$row_no.");return false;'> Update </a></td>";
-		echo "<td><a href='pleaseEnableJavascript.html' onclick='$delete_fn(".$row_no.");return false;'> Delete </a></td>";
-		echo "</tr>";
-		$row_no++;
-	}
-	echo "</table>";
+function redirect5s ($url, $delay=0) {
+	return header("Refresh: $delay; URL=/petcation$url");
 }
 
 ?>

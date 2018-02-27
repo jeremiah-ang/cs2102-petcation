@@ -15,7 +15,7 @@ function createOnSubmit (table) {
 	}
 }
 
-function makeRetrievedOnClick (link, ids) {
+function makeRetrievedOnClick (link, ids, params=[]) {
 	return function (table) {
 		return function (rowno) {
 			while (table != null && table.nodeName !== "TABLE")
@@ -28,9 +28,8 @@ function makeRetrievedOnClick (link, ids) {
 				}
 			}
 
-			var params = []
 			for (var i = 0; i < columns.length; i++) {
-				params.push(table.rows[rowno].cells[columns[i]].innerHTML.trim());
+				params.push(encodeURIComponent(table.rows[rowno].cells[columns[i]].innerHTML.trim()));
 			}
 
 			var form = document.createElement("form");
@@ -43,7 +42,7 @@ function makeRetrievedOnClick (link, ids) {
 			var key = document.createElement("input");
 			key.type = "hidden";
 			key.name = "key";
-			key.value = encodeURIComponent(params.join(","));
+			key.value = params.join(",");
 			form.appendChild(key);
 			form.appendChild(submit);
 			document.body.appendChild(form);

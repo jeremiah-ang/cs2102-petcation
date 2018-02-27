@@ -1,8 +1,9 @@
 <?php
 require_once __DIR__ . "/db.php";
+require_once __DIR__ . "/forms.php";
 
 # Convert $_POST to $table, $keys and $values in an array
-function tablekeyvalue ($post) {
+function tablekeyvalue ($post, $submitkey) {
 	$keys = [];
 	$values = [];
 	$table = NULL;
@@ -10,7 +11,7 @@ function tablekeyvalue ($post) {
 	# Iterate through $_POST
 	# keys should only have value as 'name' in form
 	foreach($post as $key => $value) {
-		if ($key === "submit") continue;
+		if ($key === $submitkey) continue;
 		if ($key === "table") {
 			$table = $value;
 			continue;
@@ -62,39 +63,32 @@ function make_update_sql_params ($table, $post, &$values) {
 		return NULL;
 	}
 
-	$sql = $sql2 = "UPDATE " . $table . " SET ";
-	$selector_key = [];
-	$selector_value = [];
-	$tmp = [];
-	foreach ($post as $key => $value) {
-		if (substr($key, 0, 3) === "key") {
-			echo $value . "<br>";
-			$selector_key[] = $value;
-			$selector_value[] = $post[$value];
-		} else if ($key !== "table" && $key !== "submit") {
-			$tmp[$key] = $value;
-		}
-	}
 
 	$keys = [];
 	$values = [];
-	foreach ($tmp as $key => $value) {
-		if (!in_array($key, $selector_key)) {
+	$selector_value = [];
+	$pk = get_primary_key($table);
+	$sql = "UPDATE $table SET ";
+	foreach ($post as $key => $value) {
+		if (!in_array($key, $pk) && $key != "update" && $key != "table") {
 			$keys[] = $key;
 			$values[] = $value;
-		}
+		} 
+	}
+	foreach ($pk as $key) {
+		$selector_value[] = $post[$key];
 	}
 
 	print_r($values);
 	prep_update_placeholder ($sql, $keys, ", ", $offset=0);
 	$sql .= " WHERE ";
-	prep_update_placeholder ($sql, $selector_key, " AND ", $offset=count($values));
+	prep_update_placeholder ($sql, $pk, " AND ", $offset=count($values));
 	
 
 	foreach ($selector_value as $key => $value) {
 		$values[] = $value;
 	}
-
+	print_r($values);
 	return $sql;
 }
 
@@ -106,8 +100,8 @@ function make_placeholders ($values) {
 	return $placeholders;
 }
 
-function parse_insert_form ($post) {
-	$tablekeyvalue = tablekeyvalue($post);
+function parse_insert_form ($post, $submitkey) {
+	$tablekeyvalue = tablekeyvalue($post, $submitkey);
 	$placeholders = make_placeholders ($tablekeyvalue['values']);
 	$sql = make_insert_sql_params ($tablekeyvalue['table'], 
 							$tablekeyvalue["keys"], 
@@ -119,8 +113,8 @@ function parse_insert_form ($post) {
 	return $result;
 }
 
-function parse_update_form ($post) {
-	$tablekeyvalue = tablekeyvalue($post);
+function parse_update_form ($post,$submitkey) {
+	$tablekeyvalue = tablekeyvalue($post, $submitkey);
 	$sql = make_update_sql_params ($tablekeyvalue['table'], 
 							$post,
 							$tablekeyvalue["values"]);
@@ -130,11 +124,11 @@ function parse_update_form ($post) {
 	return $result;
 }
 
-function parse_form ($post, $update=false) {
-	if ($update) {
-		return parse_update_form($post);
+function parse_form ($post, $submitkey) {
+	if ($submitkey === "update") {
+		return parse_update_form($post,$submitkey);
 	} else {
-		return parse_insert_form($post);
+		return parse_insert_form($post,$submitkey);
 	}
 }
 ?>
