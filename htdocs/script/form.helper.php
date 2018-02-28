@@ -58,9 +58,22 @@ function handle_submit ($post, $crud) {
 	}
 }
 
+function make_retrieved_onClick ($page_info, $fn_name, $link) {
+	echo "<script> 
+			$fn_name = makeRetrievedOnClick('/petcation". $link ."', '". $page_info['pk'] ."');
+		</script>";
+}
+function make_custom_col_link ($colheader, $fn_name) {
+	return [
+		"header" => $colheader,
+		"value" => function ($row_no) use (&$colheader, &$fn_name) {
+			return "<a href='pleaseEnableJavascript.html' onclick='$fn_name(this)(".$row_no.");return false;'> $colheader </a>";
+		}
+	];
+}
 function retrieve_table ($query_name, 
 						$params = [],
-						$bid_fn = null,
+						$custom=[],
 						$update_fn="updateOnClick(this)", 
 						$delete_fn="deleteOnClick(this)") {
 	$cursor = execute_sql_params($query_name, $params);
@@ -75,7 +88,11 @@ function retrieve_table ($query_name,
 			}
 			echo (is_null($update_fn)) ? "" : "<th> Update </th>";
 			echo (is_null($delete_fn)) ? "" : "<th> Delete </th>";
-			echo (is_null($bid_fn)) ? "" : "<th> Bid </th>";
+
+			foreach ($custom as $col) {
+				echo "<th> " . $col['header'] . "</th>";
+			}
+
 
 			echo "</tr>";
 			$keyed = true;
@@ -87,7 +104,11 @@ function retrieve_table ($query_name,
 		}
 		echo (is_null($update_fn)) ? "" : "<td><a href='pleaseEnableJavascript.html' onclick='$update_fn(".$row_no.");return false;'> Update </a></td>";
 		echo (is_null($delete_fn)) ? "" : "<td><a href='pleaseEnableJavascript.html' onclick='$delete_fn(".$row_no.");return false;'> Delete </a></td>";
-		echo (is_null($bid_fn)) ? "" : "<td><a href='pleaseEnableJavascript.html' onclick='$bid_fn(".$row_no.");return false;'> Bid </a></td>";
+
+		foreach ($custom as $col) {
+			echo "<td>" . $col['value']($row_no) . "<td>";
+		}
+
 		echo "</tr>";
 		$row_no++;
 	}

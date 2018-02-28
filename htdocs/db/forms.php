@@ -14,49 +14,49 @@ $PRIMARY_KEYS = [
 
 $FORMS = [
 	"users" => [
-		["User Id", "input", "text", "userid", ""],
-		["Full Name", "input", "text", "username", "" ],
-		["Date Of Birth", "input", "text", "dateofbirth", ""],
-		["Address", "textarea", "text", "address", ""]
+		["User Id", "input", "text", "userid", "", ['required']],
+		["Full Name", "input", "text", "username", "", ['required']],
+		["Date Of Birth", "input", "text", "dateofbirth", "", ['required']],
+		["Address", "textarea", "text", "address", "", ['required']]
 	],
 	"pets" => [
-		["Pet Id", "input", "hidden", "petid", "petid", ["readonly = 'readonly'"]],
-		["Owner User Id", "input", "text", "userid", "userid", ["readonly = 'readonly'"]],
-		["Name", "input", "text", "petname", ""],
-		["Size", "input", "text", "sizeofpet", ""],
-		["Picture", "input", "text", "picture", ""]
+		["Pet Id", "input", "hidden", "petid", "petid", ["readonly = 'readonly'", 'required']],
+		["Owner User Id", "input", "text", "userid", "userid", ["readonly = 'readonly'", 'required']],
+		["Name", "input", "text", "petname", "", ['required']],
+		["Size", "input", "text", "sizeofpet", "", ['required']],
+		["Picture", "input", "text", "picture", "", ['required']]
 	],
 	"bids" => [
-		["Buyer Id", "input", "text", "buyerid", "buyerid", ["readonly = 'readonly'"]],
-		["Seller Id", "input", "text", "sellerid", "sellerid", ["readonly = 'readonly'"]],
-		["Service Id", "input", "text", "serviceid", "serviceid", ["readonly = 'readonly'"]],
-		["Pet Id", "select", "text", "petid", "petids"],
-		["Amount", "input", "number", "amount", "", ["min = '1'"]]
+		["Buyer Id", "input", "text", "buyerid", "buyerid", ["readonly = 'readonly'", 'required']],
+		["Seller Id", "input", "text", "sellerid", "sellerid", ["readonly = 'readonly'", 'required']],
+		["Service Id", "input", "text", "serviceid", "serviceid", ["readonly = 'readonly'", 'required']],
+		["Pet Id", "select", "text", "petid", "petids", ['required']],
+		["Amount", "input", "number", "amount", "", ["min = '1'", 'required']]
 	],
 	"trans" => [
-		["Trans Id", "input", "hidden", "bidid", ""],
-		["User Id", "input", "text", "buyerid", ""],
-		["Trans Date", "input", "text", "petid", "DEFAULT"],
-		["Trans Type", "input", "text", "sellerid", ""],
-		["Trans Amount", "input", "text", "serviceid", ""]
+		["Trans Id", "input", "hidden", "bidid", "", ['required']],
+		["User Id", "input", "text", "buyerid", "", ['required']],
+		["Trans Date", "input", "text", "petid", "DEFAULT", ['required']],
+		["Trans Type", "input", "text", "sellerid", "", ['required']],
+		["Trans Amount", "input", "text", "serviceid", "", ['required']]
 	],
 	"wallet" => [
-		["Topup Id", "input", "hidden", "topupid", "topupid", ["readonly = 'readonly'"]],
-		["User Id", "input", "text", "userid", "userid", ["readonly = 'readonly'"]],
-		["Amount", "input", "text", "amount", ""]
+		["Topup Id", "input", "hidden", "topupid", "topupid", ["readonly = 'readonly'", 'required']],
+		["User Id", "input", "text", "userid", "userid", ["readonly = 'readonly'", 'required']],
+		["Amount", "input", "text", "amount", "", ['required']]
 	],
 	"winners" => [
-		["Buyer Id", "input", "text", "buyerid", ""],
-		["Pet Id", "input", "text", "petid", ""],
-		["Seller Id", "input", "text", "sellerid", ""],
-		["Service Id", "input", "text", "serviceid", ""],
-		["Amount", "input", "text", "amount", ""]
+		["Buyer Id", "input", "text", "buyerid", "", ['required']],
+		["Pet Id", "input", "text", "petid", "", ['required']],
+		["Seller Id", "input", "text", "sellerid", "", ['required']],
+		["Service Id", "input", "text", "serviceid", "", ['required']],
+		["Amount", "input", "text", "amount", "", ['required']]
 	],
 	"service" => [
-		["Service Id", "input", "hidden", "serviceid", "serviceid", ["readonly = 'readonly'"]],
-		["Seller Id", "input", "text", "userid", "userid", ["readonly = 'readonly'"]],
-		["Start Date", "input", "text", "startdate", ""],
-		["End Date", "input", "text", "enddate", ""]
+		["Service Id", "input", "hidden", "serviceid", "serviceid", ["readonly = 'readonly'", 'required']],
+		["Seller Id", "input", "text", "userid", "userid", ["readonly = 'readonly'", 'required']],
+		["Start Date", "input", "text", "startdate", "", ['required']],
+		["End Date", "input", "text", "enddate", "", ['required']]
 	]
 ];
 

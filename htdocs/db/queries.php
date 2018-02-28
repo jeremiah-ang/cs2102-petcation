@@ -61,7 +61,8 @@ $QUERIES = [
 	"bid next id" => "select case count(bidid) when 0 then 1 else max(bidid) + 1 end as next from bids",
 	"select pets of user" => "select petid, petName from pets where userid = $1",
 	"bid bought" => "select * from bids where buyerid = $1 order by petid",
-	"wallet limit" => "select credits from users where userid = $1"
+	"wallet limit" => "select credits from users where userid = $1",
+	"select bids by userid" => "select buyerid, petid, sum(amount) as amt from bids where sellerid = $1 group by (buyerid, petid, sellerid, serviceid)"
 ];
 
 generate_select_statements($QUERIES);
