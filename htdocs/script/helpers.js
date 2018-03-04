@@ -18,6 +18,7 @@ function createOnSubmit (table) {
 function makeRetrievedOnClick (link, ids, params=[]) {
 	return function (table) {
 		return function (rowno) {
+			console.log(rowno);
 			while (table != null && table.nodeName !== "TABLE")
 				table = table.parentElement;
 

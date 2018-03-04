@@ -58,9 +58,15 @@ function handle_submit ($post, $crud) {
 	}
 }
 
-function make_retrieved_onClick ($page_info, $fn_name, $link) {
+function make_retrieved_onClick ($page_info, $fn_name, $link, $params=[]) {
 	echo "<script> 
-			$fn_name = makeRetrievedOnClick('/petcation". $link ."', '". $page_info['pk'] ."');
+			$fn_name = makeRetrievedOnClick('/petcation"
+			. $link 
+			."', "
+			. $page_info['pk'] 
+			.", " 
+			. json_encode($params) 
+			. ");
 		</script>";
 }
 function make_custom_col_link ($colheader, $fn_name) {

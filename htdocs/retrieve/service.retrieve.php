@@ -13,8 +13,8 @@ check_credential();
 	<body>
 		<h1> <?= gettitle($page_info['pageinfo'])  ?> </h1>
 		<?php
-			retrieve_table("select " . gettablename($page_info['pageinfo']) . " by userid", 
-				get_username(true),
+			retrieve_table("select unwon services", // "select " . gettablename($page_info['pageinfo']) . " by userid", 
+				[get_username()],
 				[make_custom_col_link ("Bids", $fn_name)]);;
 		?>
 	</body>

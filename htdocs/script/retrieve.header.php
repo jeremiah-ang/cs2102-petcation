@@ -1,6 +1,9 @@
 <?php
 include_once __DIR__ . "/required.php";
 
+function pageinfo_setpk (&$pageinfo, $pks) {
+	$pageinfo['pk'] = json_encode($pks);
+}
 function print_retrieve_header ($file) {
 	$pageinfo = extract_page_info ($file);
 	$tablename = gettablename($pageinfo);
