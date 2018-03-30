@@ -5,33 +5,40 @@ include_once __DIR__ . "/../script/required.php";
 $PRIMARY_KEYS = [
 	"users" => ['userid'],
 	"pets" => ['petid', 'userid'],
-	"bids" => ['bidid'],
+	"bids" => ['buyerid', 'petid', 'sellerid', 'serviceid'],
 	"trans" => ['bidid', 'buyerid'],
 	"wallet" => ['topupid', 'userid'],
 	"winners" => ['buyerid', 'petid', 'sellerid', 'serviceid'],
-	"service" => ['serviceid', 'userid']
+	"service" => ['serviceid', 'userid'],
+	"stats" => []
 ];
 
 $FORMS = [
 	"users" => [
 		["User Id", "input", "text", "userid", "", ['required']],
+		["Password", "input", "password", "password", "", ['required']],
 		["Full Name", "input", "text", "username", "", ['required']],
-		["Date Of Birth", "input", "text", "dateofbirth", "", ['required']],
+		["Date Of Birth", "input", "date", "dateofbirth", "", ['required']],
 		["Address", "textarea", "text", "address", "", ['required']]
 	],
 	"pets" => [
 		["Pet Id", "input", "hidden", "petid", "petid", ["readonly = 'readonly'", 'required']],
 		["Owner User Id", "input", "text", "userid", "userid", ["readonly = 'readonly'", 'required']],
 		["Name", "input", "text", "petname", "", ['required']],
-		["Size", "input", "text", "sizeofpet", "", ['required']],
-		["Picture", "input", "text", "picture", "", ['required']]
+		["Type", "select", "text", "pettype", "pettype", ['required']]
 	],
 	"bids" => [
-		["Buyer Id", "input", "text", "buyerid", "buyerid", ["readonly = 'readonly'", 'required']],
-		["Seller Id", "input", "text", "sellerid", "sellerid", ["readonly = 'readonly'", 'required']],
-		["Service Id", "input", "text", "serviceid", "serviceid", ["readonly = 'readonly'", 'required']],
-		["Pet Id", "select", "text", "petid", "petids", ['required']],
-		["Amount", "input", "number", "amount", "", ["min = '1'", 'required']]
+		["Buyer Id", "input", "text", "3buyerid", "buyerid", ["readonly = 'readonly'", 'required']],
+		["Seller Id", "input", "text", "1sellerid", "sellerid", ["readonly = 'readonly'", 'required']],
+		["Service Id", "input", "text", "2serviceid", "serviceid", ["readonly = 'readonly'", 'required']],
+
+		["Start Date", "input", "date", "_startdate", "_startdate",["readonly = 'readonly'",'required']],
+		["End Date", "input", "date", "_enddate", "_enddate",["readonly = 'readonly'",'required']],
+		["Pet Type", "input", "text", "_pettype", "_pettype",["readonly = 'readonly'",'required']],
+		["Description", "textarea", "text", "_description", "_description",["readonly = 'readonly'",'required']],
+
+		["Pet Id", "select", "text", "4petid", "petids", ['required']],
+		["Amount", "input", "number", "5amount", "amount", ["min = '1'", 'required']]
 	],
 	"trans" => [
 		["Trans Id", "input", "hidden", "bidid", "", ['required']],
@@ -41,22 +48,16 @@ $FORMS = [
 		["Trans Amount", "input", "text", "serviceid", "", ['required']]
 	],
 	"wallet" => [
-		["Topup Id", "input", "hidden", "topupid", "topupid", ["readonly = 'readonly'", 'required']],
-		["User Id", "input", "text", "userid", "userid", ["readonly = 'readonly'", 'required']],
-		["Amount", "input", "text", "amount", "", ['required']]
-	],
-	"winners" => [
-		["Buyer Id", "input", "text", "buyerid", "", ['required']],
-		["Pet Id", "input", "text", "petid", "", ['required']],
-		["Seller Id", "input", "text", "sellerid", "", ['required']],
-		["Service Id", "input", "text", "serviceid", "", ['required']],
-		["Amount", "input", "text", "amount", "", ['required']]
+		["User Id", "input", "text", "1userid", "userid", ["readonly = 'readonly'", 'required']],
+		["Amount", "input", "text", "2amount", "", ['required']]
 	],
 	"service" => [
 		["Service Id", "input", "hidden", "serviceid", "serviceid", ["readonly = 'readonly'", 'required']],
 		["Seller Id", "input", "text", "userid", "userid", ["readonly = 'readonly'", 'required']],
-		["Start Date", "input", "text", "startdate", "", ['required']],
-		["End Date", "input", "text", "enddate", "", ['required']]
+		["Start Date", "input", "date", "startdate", "", ['required']],
+		["End Date", "input", "date", "enddate", "", ['required']],
+		["Pet Type Allowed", "select", "text", "pettype", "pettype", ['required']],
+		["Description", "textarea", "text", "description", "", ['required']]
 	]
 ];
 
@@ -76,6 +77,7 @@ function CREATE_TABLE ($crud, $tablename, $values=[], $attrs=[], $method="POST",
 		$updateAttr = (isset($options[6])) ? $options[6] : [];
 
 		$attr = make_attr($crud, $tablename, $name, $createAttr, $updateAttr, $attrs);
+
 		$field = make_field($tagname, $type, $name, $value, $attr);
 		if ($type === "hidden") {
 			$hidden .= $field;
@@ -90,10 +92,21 @@ function CREATE_TABLE ($crud, $tablename, $values=[], $attrs=[], $method="POST",
 
 	return $fields;
 }
-function CREATE_UPDATE_TABLE ($post, $query, $crud, $tablename) {
+function CREATE_UPDATE_TABLE ($post, $query, $crud, $tablename, $options=[]) {
 	if (has_update_key($post)) {
 		$key = get_update_key($post);
 		$row = retrieve_row ($query, $key);
+		foreach ($row as $key=>$value) {
+			if (isset($options[$key])) {
+				foreach ($options[$key] as $optionkey=>$option) {
+					if ($option[0] === $value) {
+						$options[$key][$optionkey][] = TRUE;
+					}
+				}
+				$row[$key] = $options[$key];
+			}
+		}
+
 		echo CREATE_TABLE($crud, $tablename, $row);
 	}
 }
@@ -117,14 +130,13 @@ function make_attr ($crud, $tablename, $name, $createAttr, $updateAttr, $attrs) 
 function make_form (&$fields, $hidden, $crud, $tablename, $method, $formname=NULL, $action=NULL) {
 	$formname = (is_null($formname)) ? $crud . $tablename : $formname;
 	$action = (is_null($action)) ? "" : "action='$action'";
-	$form = "<form name='$formname' method='$method' $action onsubmit='return formOnSubmit(this);'> ";
+	$form = "<form id='input_form' name='$formname' method='$method' $action onsubmit='return formOnSubmit(this);'> ";
 	$form .= "<input type='hidden' name='table' value='$tablename'></input>";
 	$form .= $hidden;
 	$fields = $form . $fields . "<input type='submit' name='$crud'></input></form>";
 }
 
 function make_field ($tagname, $type, $name, $value, $attr) {
-	$field;
 	if ($tagname === "textarea") {
 		$field = make_textarea ($name, $value, $attr);
 	} else if ($tagname === "input") {
@@ -151,12 +163,20 @@ function make_textarea ($name, $value, $attr) {
 	return "<textarea name='$name' $attr >$value</textarea>";
 }
 function make_input ($name, $value, $type, $attr) {
+	$today = "";
+	if ($type == "date") {
+		$today = "min = " . date("d/m/Y");
+	}
 	return "<input type='$type' name='$name' $attr value='$value'></input>";
 }
 function make_select ($name, $value, $attr) {
+	
 	$select = "<select $attr name=$name>";
 	foreach($value as $row) {
-		$select .= "<option value=$row[0]>$row[1]</option>";
+		$selected = "";
+		if (isset($row[2]))
+			$selected = "selected";
+		$select .= "<option value=$row[0] $selected>$row[1]</option>";
 	}
 	$select .= "</select>";
 	return $select;

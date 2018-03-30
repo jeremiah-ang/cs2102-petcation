@@ -2,7 +2,20 @@
 include_once __DIR__ . "/../script/retrieve.header.php";
 check_credential();
 
-if (!isset($_POST['key'])) {
+
+if (array_key_exists('Submit', $_POST)) {
+	$serviceid = $_POST['serviceid'];
+	$sellerid = $_POST['sellerid'];
+	unset($_POST["Submit"]);
+	unset($_POST["serviceid"]);
+	unset($_POST["sellerid"]);
+	$winners = [];
+	foreach ($_POST as $key=>$value) {
+		$winners[] = explode(",", $value);
+	}
+	handle_winner_create ($sellerid, $serviceid, $winners);
+	return; 
+} else if (!isset($_POST['key'])) {
 	die("Error! No key found!");
 }
 
@@ -13,20 +26,44 @@ $params = array_map(
 ?>
 <html>
 	<head>
-		<?php
-			$page_info = print_retrieve_header (__FILE__);
-			$fn_name = "acceptBids";
-
-			pageinfo_setpk ($page_info, ['buyerid', 'petid', 'amt']);
-			make_retrieved_onClick($page_info, $fn_name, "/create/winners.create.php", explode(",", $_POST['key']));
-		?>
+		<title> Create Winners </title>
 	</head>
 	<body>
-		<h1> <?= gettitle($page_info['pageinfo']) ?> </h1>
+		<h1> <?= "Create Winners" ?> </h1>
 		<?php
-			retrieve_table("select " . gettablename($page_info['pageinfo']) . " by serviceid and userid",
-				$params, 
-				[make_custom_col_link ("Accept", $fn_name)]);
+			$sellerid = $params[1];
+			$serviceid = $params[0];
+
+			$result = execute_sql_params("select bids by serviceid and userid", $params);
+			if ($result != FALSE) {
+				if (pg_num_rows($result) == 0) {
+					echo "<h2> 0 rows </h2>";
+					return;
+				}
+			} else {
+				echo "Something Went Wrong!";
+				return;
+			}
+
+			$i = 0;
+			echo "<form method='post' id='input_form'>
+				<input type = 'hidden' name = 'sellerid' value = '$sellerid'></input>
+				<input type = 'hidden' name = 'serviceid' value = '$serviceid'></input>
+				<table> <tr> <th>Select</th> <th>bidder</th> <th>petid</th> <th>bid amount</th></tr>";
+
+			while ($bid = pg_fetch_assoc($result)) {
+				echo "<tr>";
+				echo "<td><input type='checkbox' name=" . $i++ . " value='" . implode(",", $bid) . "'></input></td>";
+				foreach ($bid as $info=>$value) {
+					echo "<td>" . $value . "</td>";
+				}
+				echo "</tr>";
+			}
+
+			echo "</table><input type='submit' name='Submit'></form>";
 		?>
+		
 	</body>
 </html>
+
+

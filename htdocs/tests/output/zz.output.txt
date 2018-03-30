@@ -1,0 +1,65 @@
+>> Creating Users 
+>> 3 User Created 
+>> User0: Creating 4 Service 
+		(01/01/2019,31/12/2019,Dog,Service Description 1)
+		(01/01/2019,30/11/2019,Dog,Service Description 2)
+		(01/01/2019,31/11/2019,Dog,INVALID Date (November don't have day 31))
+		(31/12/2019,31/12/2018,Dog,INVALID DATE (Start date > End date))
+		(31/12/2016,31/12/2017,Dog,INVALID DATE (Dates already over))
+
+>> User1: Create 2 Pet, Top up 2 times, Bid 3 times! 
+		(pet1,Dog,no)
+		(pet2,Dog,no)
+
+		(500)
+		(500)
+
+		(1,user0,pet1,50)
+		(1,user0,pet1,30)
+		(1,user0,pet1,50)
+		(1,user0,pet2,50)
+
+>> User2: Create 2 Pet, Top up 2 times, Bid 2 times! 
+		(pet3,Dog,no)
+		(pet4,Dog,no)
+
+		(500)
+		(500)
+
+		(1,user0,pet3,50)
+		(1,user0,pet4,30)
+
+>> User0: Accpet Bids
+		(1)
+		(user1,1)
+		(user2,2)
+
+ userid | username  | dateofbirth | address  | password  | credits | status | isadmin 
+--------+-----------+-------------+----------+-----------+---------+--------+---------
+ admin  | admin     | 2018-01-02  | cs2102   | admin     |       0 | ACTIVE | t
+ user1  | fullname1 | 2017-02-09  | address1 | password1 |     950 | ACTIVE | f
+ user2  | fullname2 | 2017-02-09  | address2 | password2 |     970 | ACTIVE | f
+ user0  | fullname0 | 2017-02-09  | address0 | password0 |      80 | ACTIVE | f
+(4 rows)
+
+ serviceid | userid |            description            | pettype | startdate  |  enddate   |  status  
+-----------+--------+-----------------------------------+---------+------------+------------+----------
+         2 | user0  | Service Description 2             |       1 | 2019-01-01 | 2019-11-30 | ACTIVE
+         3 | user0  | INVALID DATE (Dates already over) |       1 | 2016-12-31 | 2017-12-31 | ACTIVE
+         1 | user0  | Service Description 1             |       1 | 2019-01-01 | 2019-12-31 | INACTIVE
+(3 rows)
+
+ petid | userid | petname | pettype | status 
+-------+--------+---------+---------+--------
+     1 | user1  | pet1    |       1 | ACTIVE
+     2 | user1  | pet2    |       1 | ACTIVE
+     1 | user2  | pet3    |       1 | ACTIVE
+     2 | user2  | pet4    |       1 | ACTIVE
+(4 rows)
+
+ buyerid | petid | sellerid | serviceid | amount | winner 
+---------+-------+----------+-----------+--------+--------
+ user1   |     1 | user0    |         1 |     50 | t
+ user2   |     2 | user0    |         1 |     30 | t
+(2 rows)
+

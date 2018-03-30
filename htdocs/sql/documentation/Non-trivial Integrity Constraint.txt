@@ -1,0 +1,153 @@
+1) Update Bids
+Constraint: New Bid amount should be within user's capabilities
+Implementation: A TRIGGER is created on Bids table BEFORE UPDATE to ensure NEW.bid_amt < user.credits + OLD.bid_amt
+
+'''
+CREATE OR REPLACE FUNCTION replacebid_trigger()
+    RETURNS TRIGGER AS $replacebid_trigger$
+    BEGIN
+        -- Ensure there's enough to bid
+        IF NEW.amount > (SELECT credits FROM users WHERE userid = OLD.buyerid) + OLD.amount
+        THEN
+            raise exception 'Not Enough Credit! New Bid: % Wallet: %', NEW.amount, (SELECT credits FROM users WHERE userid = OLD.buyerid) + OLD.amount;
+            RETURN OLD;
+        END IF;
+
+        PERFORM make_transaction (NEW.buyerid::VARCHAR, (OLD.amount - NEW.amount)::INTEGER, 'CREDIT'::TRANSTYPE);
+        RETURN NEW;
+    END;
+    $replacebid_trigger$ LANGUAGE plpgsql;
+
+CREATE TRIGGER replacebid_trigger
+    BEFORE UPDATE
+    ON Bids
+    FOR EACH ROW
+    EXECUTE PROCEDURE replacebid_trigger();
+'''
+
+
+
+
+2) Updating a Pet
+Constraint: If a pet is part of a bid, then it should not be allowed to be updated
+Implementation: A TRIGGER is created on Pets table BEFORE UPDATE to check that the pet being updated is not part of a Bid. If it is, update is prevented, otherwise the update is allowed.
+
+
+'''
+CREATE OR REPLACE FUNCTION check_before_update_pets()
+RETURNS TRIGGER AS 
+$$
+BEGIN
+    IF OLD.petId = (SELECT  petId 
+                    FROM    Bids 
+                    WHERE   petId = OLD.petId 
+                    AND     buyerId = OLD.userId 
+                    AND     OLD.status = 'ACTIVE')
+    AND OLD.status = NEW.status 
+    THEN 
+        raise exception 'Pets have bidded service, prevented deletion.';
+        RETURN NULL;
+    ELSE 
+        raise notice 'Pets have not bidded for any service, allow update.';
+    END IF;
+    RETURN NEW;
+END;
+$$
+LANGUAGE PLPGSQL;
+
+CREATE TRIGGER check_before_update_pets 
+BEFORE UPDATE
+ON Pets
+FOR EACH ROW
+EXECUTE PROCEDURE check_before_update_pets();
+'''
+
+
+
+
+3) PetId and ServiceID
+Constraint: IDs should be in running number in respect to UserId 
+Implmentation: A TRIGGER is created on Pet and Service table BEFORE INSERT to set the PetId/ServiceId to the next biggest number before inserting
+
+-- Function to find next id
+DROP FUNCTION IF EXISTS get_next_id (tblname NAME, col VARCHAR, uid VARCHAR);
+CREATE FUNCTION get_next_id (tblname NAME, col VARCHAR, uid VARCHAR)
+    RETURNS INTEGER AS $get_next_id$
+    DECLARE
+        next_id INTEGER;
+    BEGIN
+        EXECUTE format ('SELECT CASE count(%s) WHEN 0 THEN 1 ELSE max(%s) + 1 END
+                            FROM %s WHERE userId = ''%s''', 
+                            col, col, tblname, uid)
+        INTO next_id;
+        RETURN next_id;
+    END
+    $get_next_id$ LANGUAGE plpgsql;
+
+-- Trigger to auto increment petId
+CREATE OR REPLACE FUNCTION trigger_insert_pets()
+    RETURNS TRIGGER AS $trigger_insert_pets$
+    DECLARE 
+        next_id INTEGER;
+    BEGIN
+        SELECT get_next_id (tg_table_name, 'petid'::VARCHAR, NEW.userid)
+        INTO next_id;
+        NEW.petid := next_id;
+        RETURN NEW;
+    END
+    $trigger_insert_pets$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_insert_pets
+    BEFORE INSERT
+    ON Pets
+    FOR EACH ROW
+    EXECUTE PROCEDURE trigger_insert_pets();
+
+-- Trigger to auto increment serviceId
+CREATE OR REPLACE FUNCTION trigger_insert_service()
+    RETURNS TRIGGER AS $trigger_insert_service$
+    DECLARE
+        next_id INTEGER;
+    BEGIN
+        SELECT get_next_id (tg_table_name, 'serviceid'::VARCHAR, NEW.userid)
+        INTO next_id;
+        NEW.serviceid := next_id;
+        RETURN NEW;
+    END
+    $trigger_insert_service$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_insert_service
+    BEFORE INSERT
+    ON Service
+    FOR EACH ROW
+    EXECUTE PROCEDURE trigger_insert_service();
+
+
+4) Status 
+Constraint: The value of the status is either 'ACTIVE' or 'INACTIVE'
+Implementation: Create a new enum type called status
+
+'''
+CREATE TYPE status as ENUM ('ACTIVE', 'INACTIVE');
+'''
+
+
+5) Start and End date of Service
+Constraint: Start date of service should be earlier than end date of service 
+Implementation: Add a check clause while creating table
+
+'''
+CREATE TABLE Service (
+    serviceId       INTEGER, -- auto increment type?
+    userId          VARCHAR(255), 
+    description     TEXT,
+    petType         INTEGER,
+    startDate       DATE, 
+    endDate         DATE, 
+    status          STATUS default 'ACTIVE',
+    PRIMARY KEY     (serviceId, userId),
+    FOREIGN KEY     (userId) REFERENCES Users(userId) ON DELETE CASCADE,
+    FOREIGN KEY     (petType) REFERENCES PetType(typeId),
+    CHECK           (endDate > startDate)
+);
+'''

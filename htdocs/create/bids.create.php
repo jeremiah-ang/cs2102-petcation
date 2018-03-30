@@ -5,7 +5,7 @@ $crud = $pageinfo[1];
 $tablename = $pageinfo[0];
 $title = $pageinfo[2];
 
-handle_submit ($_POST, $crud);
+handle_submit ($_POST, $crud, "insert bid on conflict");
 if (!isset($_POST["key"])) {
 	redirect5s("/retrieve/service.retrieve.all.php");
 	return;
@@ -16,7 +16,18 @@ $values = explode(",", $_POST["key"]);
 $buyerid = get_username();
 $sellerid = $values[1];
 $serviceid = $values[0];
-$petids = get_petids(get_username());
+$service = get_service($sellerid, $serviceid);
+if (is_null($service)) {
+	echo "<h2> Error! No Service Found! </h2>";
+	kill();
+}
+
+$startdate = $service['startdate'];
+$enddate = $service['enddate'];
+$pettype = $service['pettype'];
+$description = $service['description'];
+
+$petids = get_petids(get_username(), $pettype);
 $walletlimit = get_walletlimit(get_username());
 ?>
 <html>
@@ -28,15 +39,24 @@ $walletlimit = get_walletlimit(get_username());
 		<h1> <?= $title ?> </h1>
 
 		<?php
-			echo CREATE_TABLE($crud, $tablename, [
-				"bidid" => $bidid,
-				"buyerid" => $buyerid,
-				"sellerid" => $sellerid,
-				"serviceid" => $serviceid,
-				"petids" => $petids
-			], [
-				"amount" => ["max = '$walletlimit'"]
-			]);
+			if (count($petids) == 0) {
+				echo "<h2> Service: $serviceid, Seller: $sellerid </h2><p> You have no $pettype </p>";
+			} else {
+				echo CREATE_TABLE($crud, $tablename, [
+					"bidid" => $bidid,
+					"buyerid" => $buyerid,
+					"sellerid" => $sellerid,
+					"serviceid" => $serviceid,
+					"petids" => $petids,
+					"_startdate" => $startdate,
+					"_enddate" => $enddate,
+					"_pettype" => $pettype,
+					"_description" => $description
+				], [
+					"amount" => ["max = '$walletlimit'"]
+				]);
+			}
+			
 			
 		?>
 		<script>

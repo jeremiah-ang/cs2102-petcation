@@ -22,4 +22,5 @@ function redirect5s ($url, $delay=0) {
 	return header("Refresh: $delay; URL=/petcation$url");
 }
 
+
 ?>

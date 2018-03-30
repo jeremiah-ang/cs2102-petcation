@@ -1,0 +1,5 @@
+Bitnami Infrastructure Stack (MAPP for MacOS)
+	- Apache
+	- PHP
+	- phpPgAdmin
+	- PostgreSQL

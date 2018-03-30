@@ -25,11 +25,21 @@ function make_values ($key, $query_name) {
 }
 function get_next_id ($query_name, $username=NULL) {
 	return -1;
-	// $cursor = execute_sql_params($query_name, (is_null($username)) ? [] : [$username]);
-	// return pg_fetch_assoc($cursor)['next'];
 }
-function get_petids ($username) {
-	$cursor = execute_sql_params("select pets of user", [$username]);
+
+function get_service ($sellerid, $serviceid) {
+	$cursor = execute_sql_params("get service", [$sellerid, $serviceid]);
+	if (is_null($cursor)) { return NULL; }
+	if (pg_num_rows($cursor) == 0) { return NULL; }
+	$result = pg_fetch_assoc($cursor);
+	return $result;
+}
+function get_petids ($username, $pettype=NULL) {
+	if (is_null($pettype)) {
+		$cursor = execute_sql_params("get all petids", [$username]);
+	} else {
+		$cursor = execute_sql_params("get petids for bidding", [$username, $pettype]);
+	}
 	if (is_null($cursor)) {
 		return [];
 	}
@@ -39,23 +49,52 @@ function get_petids ($username) {
 	}
 	return $result;
 }
+function get_pettypes () {
+	$results = execute_sql_params("get pet types", []);
+	$pettypes = [];
+	while ($row = pg_fetch_assoc($results)) {
+		$pettypes[] = [$row['typeid'], $row['typedescription']];
+	}
+	return $pettypes;
+}
 function get_walletlimit ($username) {
 	$cursor = execute_sql_params("wallet limit", [$username]);
 	return pg_fetch_assoc($cursor)['credits'];
 }
 
-function handle_submit ($post, $crud) {
-	if (has_submit_key($post, $crud)) {
-		$sql_query = parse_form($post, $crud);
-		if (!$sql_query) {
-			echo "Something Went Wrong!";
-		} else {
-			echo "Add Successful!";
-		}
-	} else {
-		echo "No Submit Key! $crud <br/>";
-		print_r($post);
+function handle_submit (
+	$post, 
+	$crud, 
+	$sql=NULL) {
+	if (!is_null($sql)) {
+		$sql = get_query($sql);
 	}
+	
+	if (has_submit_key($post, $crud)) {
+		$sql_query = parse_form($post, $crud, $sql);
+		return !is_null($sql_query);
+	}
+	return false;
+}
+
+function handle_winner_create ($sellerid, $serviceid, $winners) {
+	$queries = [];
+	$params = [];
+	
+	foreach ($winners as $winner) {
+		$buyerid = $winner[0];
+		$petid = $winner[1];
+		$params[] = [$sellerid, $serviceid, $buyerid, $petid];
+		$queries[] = "create winner";
+	}
+
+	$queries[] = "refund";
+	$params[] = [$sellerid, $serviceid];
+
+	$queries[] = "delete from service";
+	$params[] = [$serviceid, $sellerid];
+
+	execute_sqls_params($queries, $params);
 }
 
 function make_retrieved_onClick ($page_info, $fn_name, $link, $params=[]) {
@@ -86,6 +125,10 @@ function retrieve_table ($query_name,
 	$keyed = false;
 	$row_no = 1;
 	echo "<table id='retrievedTable'>";
+	if (pg_num_rows($cursor) == 0) {
+		echo "<h2> 0 rows </h2>";
+		return;
+	}
 	while ($row = pg_fetch_assoc($cursor)) {
 		if (!$keyed) {
 			echo "<tr>";
@@ -94,10 +137,12 @@ function retrieve_table ($query_name,
 			}
 			echo (is_null($update_fn)) ? "" : "<th> Update </th>";
 			echo (is_null($delete_fn)) ? "" : "<th> Delete </th>";
-
-			foreach ($custom as $col) {
-				echo "<th> " . $col['header'] . "</th>";
+			if (count($custom) > 0) {
+				foreach ($custom as $col) {
+					echo "<th> " . $col['header'] . "</th>";
+				}
 			}
+			
 
 
 			echo "</tr>";
@@ -111,9 +156,12 @@ function retrieve_table ($query_name,
 		echo (is_null($update_fn)) ? "" : "<td><a href='pleaseEnableJavascript.html' onclick='$update_fn(".$row_no.");return false;'> Update </a></td>";
 		echo (is_null($delete_fn)) ? "" : "<td><a href='pleaseEnableJavascript.html' onclick='$delete_fn(".$row_no.");return false;'> Delete </a></td>";
 
-		foreach ($custom as $col) {
-			echo "<td>" . $col['value']($row_no) . "<td>";
+		if (count($custom) > 0) {
+			foreach ($custom as $col) {
+				echo "<td>" . $col['value']($row_no) . "<td>";
+			}
 		}
+		
 
 		echo "</tr>";
 		$row_no++;

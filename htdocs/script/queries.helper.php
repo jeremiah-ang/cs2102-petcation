@@ -11,6 +11,7 @@ function generate_select_statements (&$queries) {
 		$queries[$selectall] = $selectallquery;
 	}
 }
+
 function generate_keys_statements (&$queries) {
 	global $PRIMARY_KEYS;
 
@@ -43,7 +44,7 @@ function generate_placeholder ($value) {
 function generate_select_by_user_statements ($tables, &$queries) {
 	foreach ($tables as $table=>$col) {
 		$key = "select $table by userid";
-		$value = "select * from $table where userid = $1";
+		$value = "select * from $table where status = 'ACTIVE' AND userid = $1";
 		$queries[$key] = $value;
 	}
 }

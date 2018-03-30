@@ -9,13 +9,19 @@ if (isset($_POST['key'])) {
 	$fn = function (&$s) { rawurldecode($s); };
 	array_map($fn, $keys);
 
-	$result = execute_sql_params ($query, $keys);
-	if (!$result) {
-		echo "Failed to delete!";
-	} else {
-		echo gettablename($page_info) . ": " . implode(", ", $keys) . " Deleted! <br/>";
-		echo "Redirecting ...";
-		redirect5s('/retrieve/'.gettablename($page_info).'.retrieve'.getextra($page_info).'.php');
+	try {
+		$result = execute_sql_params ($query, $keys);
+		if (!$result) {
+			echo "Failed to delete!";
+		} else {
+			echo gettablename($page_info) . ": " . implode(", ", $keys) . " Deleted! <br/>";
+			echo "Redirecting ...";
+			redirect5s('/retrieve/'.gettablename($page_info).'.retrieve'.getextra($page_info).'.php');
+		}
+	} catch (Exception $e) {
+		echo "<div id = 'error'>". $e ."</div>";
 	}
+
+	
 }
 ?>

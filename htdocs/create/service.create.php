@@ -16,6 +16,9 @@ $title = $pageinfo[2];
 
 		<?php
 			$values = make_values ("serviceid", "service next id");
+			$pettypes = get_pettypes();
+			$sizes = ["pettype" => $pettypes];
+			$values = array_merge($values, $sizes);
 			echo CREATE_TABLE($crud, $tablename, $values);
 			handle_submit ($_POST, $crud)
 		?>

@@ -1,21 +1,21 @@
 <?php
 include_once __DIR__ . "/../script/retrieve.header.php";
-check_credential();
+
+if (isset($_POST['key'])) {
+	$key = explode(",", $_POST['key']);
+	$serviceid = $key[0];
+	$userid = $key[1];
+}
 ?>
 <html>
 	<head>
-		<?php
-			$page_info = print_retrieve_header (__FILE__);
-			$fn_name = "bidOnCLick";
-			make_retrieved_onClick ($page_info, $fn_name, "/retrieve/bids.retrieve.php");
-		?>
+		<title> Service </title>
 	</head>
 	<body>
-		<h1> <?= gettitle($page_info['pageinfo'])  ?> </h1>
+		<h1> Service </h1>
 		<?php
-			retrieve_table("select unwon services", // "select " . gettablename($page_info['pageinfo']) . " by userid", 
-				[get_username()],
-				[make_custom_col_link ("Bids", $fn_name)]);;
+			retrieve_table("select service by userid and serviceid", 
+				[$userid, $serviceid], [], NULL,);
 		?>
 	</body>
 </html>

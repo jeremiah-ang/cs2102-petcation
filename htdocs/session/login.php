@@ -10,7 +10,7 @@ if (has_username ()) {
 		<title> Login </title>
 	</head>
 	<body>
-		<form method="post">
+		<form id="login-form" method="post">
 			<ul>
 				<li><label>Username: </label><input type="text" name="username"></li>
 				<li><label>Password: </label><input type="password" name="password"></li>
@@ -24,7 +24,7 @@ if (has_username ()) {
 				set_credential($_POST['username']);
 				redirect5s("/session/profile.php");
 			} else {
-				echo "Invalid Username/Password";
+				echo "<p> Invalid Username/Password </p>";
 			}
 		}
 		?>

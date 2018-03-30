@@ -17,7 +17,7 @@ $title = $pageinfo[2];
 		<?php
 			$values = make_values ("topupid", "wallet next id");
 			echo CREATE_TABLE($crud, $tablename, $values);
-			handle_submit ($_POST, $crud)
+			handle_submit ($_POST, $crud, "insert into wallet");
 		?>
 		<script>
 			var formOnSubmit = createOnSubmit(<?= "'" . $tablename . "'" ?>);

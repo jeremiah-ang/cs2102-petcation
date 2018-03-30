@@ -15,7 +15,10 @@ $title = $pageinfo[2];
 		<h1> <?= $title ?> </h1>
 
 		<?php
-			CREATE_UPDATE_TABLE ($_POST, "select * from $tablename with key", $crud, $tablename);
+
+			$pettypes = get_pettypes();
+			$sizes = ["pettype" => $pettypes];
+			CREATE_UPDATE_TABLE ($_POST, "select * from $tablename with key", $crud, $tablename, $sizes);
 			handle_submit ($_POST, $crud);
 		?>
 		<script>

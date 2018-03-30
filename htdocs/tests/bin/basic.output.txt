@@ -1,0 +1,76 @@
+>> Creating Users
+>> 3 User Created
+>> User0: Creating 3 Service
+		(2018-01-01,2018-12-31,Dog,Service Description 1)
+		(2019-12-31,2018-12-31,Dog,Service Description 2)
+		(2016-12-31,2017-12-31,Dog,Service Description 3)
+
+>> User1: Create 2 Pet, Top up 2 times, Bid 3 times!
+		(pet1,Dog,no)
+		(pet2,Dog,no)
+
+		(500)
+		(500)
+
+		(1,user0,pet1,50)
+		(1,user0,pet1,30)
+		(1,user0,pet1,50)
+		(1,user0,pet2,50)
+
+>> User2: Create 2 Pet, Top up 2 times, Bid 2 times!
+		(pet3,Dog,no)
+		(pet4,Dog,no)
+
+		(500)
+		(500)
+
+		(1,user0,pet3,50)
+		(1,user0,pet4,30)
+
+>> User0: Accpet Bids
+		(1)
+		(user1,1)
+		(user2,2)
+
+>> User1: Place Bids for pet2
+		(2,user0,pet2,100)
+
+>> User1: Remove Pet2
+		(pet2)
+>> User 1: Place bid
+		(2,user0,pet1,100)
+
+>> User 0: Delete Service!
+		(2)
+
+ userid | username  | dateofbirth | address  | password  | credits | status | type
+--------+-----------+-------------+----------+-----------+---------+--------+------
+ user0  | fullname0 | 2017-02-09  | address0 | password0 |      80 | ACTIVE | USER
+ user2  | fullname2 | 2017-02-09  | address2 | password2 |     970 | ACTIVE | USER
+ user1  | fullname1 | 2017-02-09  | address1 | password1 |     950 | ACTIVE | USER
+(3 rows)
+
+ serviceid | userid |      description      | pettype | startdate  |  enddate   |  status
+-----------+--------+-----------------------+---------+------------+------------+----------
+         3 | user0  | Service Description 3 | DOG     | 2016-12-31 | 2017-12-31 | ACTIVE
+         1 | user0  | Service Description 1 | DOG     | 2018-01-01 | 2018-12-31 | INACTIVE
+         2 | user0  | Service Description 2 | DOG     | 2019-12-31 | 2018-12-31 | INACTIVE
+(3 rows)
+
+ petid | userid | petname | pettype | picture |  status
+-------+--------+---------+---------+---------+----------
+     1 | user1  | pet1    | DOG     | no      | ACTIVE
+     1 | user2  | pet3    | DOG     | no      | ACTIVE
+     2 | user2  | pet4    | DOG     | no      | ACTIVE
+     2 | user1  | pet2    | DOG     | no      | INACTIVE
+(4 rows)
+
+ buyerid | petid | sellerid | serviceid | amount
+---------+-------+----------+-----------+--------
+(0 rows)
+
+ buyerid | petid | sellerid | serviceid | amount
+---------+-------+----------+-----------+--------
+ user1   |     1 | user0    |         1 |     50
+ user2   |     2 | user0    |         1 |     30
+(2 rows)

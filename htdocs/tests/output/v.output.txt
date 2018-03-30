@@ -1,0 +1,19 @@
+ userid |   username    | dateofbirth |   address   |  password   | credits | status | isadmin 
+--------+---------------+-------------+-------------+-------------+---------+--------+---------
+ admin  | admin         | 2018-01-02  | cs2102      | admin       |       0 | ACTIVE | t
+ user1  | fullname1     | 2017-02-09  | address1    | password1   |       0 | ACTIVE | f
+ user0  | new full name | 1994-09-01  | new address | passwordnew |     500 | ACTIVE | f
+(3 rows)
+
+ serviceid | userid | description | pettype | startdate | enddate | status 
+-----------+--------+-------------+---------+-----------+---------+--------
+(0 rows)
+
+ petid | userid | petname | pettype | picture | status 
+-------+--------+---------+---------+---------+--------
+(0 rows)
+
+ buyerid | petid | sellerid | serviceid | amount | winner 
+---------+-------+----------+-----------+--------+--------
+(0 rows)
+

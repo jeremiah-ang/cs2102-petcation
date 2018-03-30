@@ -1,0 +1,24 @@
+User Table
+R = {userId, userName, dateOfBirth, address, password, credit, status, isAdmin}
+F = {{userId} --> {userName, dateOfBirth, address, password, credit, status, isAdmin}}
+-- In BCNF
+
+Pets Table
+R = {userId, petId, petName, typeId, picture, status}
+F = {{userId, petId} --> {petName, typeId, picture, status}}
+-- In BCNF
+
+Service Table
+R = {serviceId, userId, description, typeId, startDate, endDate, status}
+F = {{serviceId, userId} --> {description, typeId, startDate, endDate, status}}
+-- In BCNF
+
+Bids Table
+R = {buyerId, petId, sellerId, serviceId, amount, winner}
+F = {{buyerId, petId, sellerId, serviceId} --> {amount, winner}}
+-- In BCNF
+
+Pettype Table
+R = {typeId, typeDescription}
+F = {{typeId} --> {typeDescription}}
+-- In BCNF

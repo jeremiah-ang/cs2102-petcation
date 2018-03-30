@@ -1,0 +1,52 @@
+ userid | username  | dateofbirth | address  | password  | credits | status | isadmin 
+--------+-----------+-------------+----------+-----------+---------+--------+---------
+ admin  | admin     | 2018-01-02  | cs2102   | admin     |       0 | ACTIVE | t
+ user0  | fullname0 | 2017-02-09  | address0 | password0 |       0 | ACTIVE | f
+ user1  | fullname1 | 2017-02-09  | address1 | password1 |       0 | ACTIVE | f
+ user2  | fullname2 | 2017-02-09  | address2 | password2 |       0 | ACTIVE | f
+ user3  | fullname3 | 2017-02-09  | address3 | password3 |       0 | ACTIVE | f
+ user4  | fullname4 | 2017-02-09  | address4 | password4 |       0 | ACTIVE | f
+ user5  | fullname5 | 2017-02-09  | address5 | password5 |       0 | ACTIVE | f
+ user6  | fullname6 | 2017-02-09  | address6 | password6 |       0 | ACTIVE | f
+ user7  | fullname7 | 2017-02-09  | address7 | password7 |       0 | ACTIVE | f
+ user8  | fullname8 | 2017-02-09  | address8 | password8 |       0 | ACTIVE | f
+ user9  | fullname9 | 2017-02-09  | address9 | password9 |       0 | ACTIVE | f
+(11 rows)
+
+ serviceid | userid | description | pettype | startdate | enddate | status 
+-----------+--------+-------------+---------+-----------+---------+--------
+(0 rows)
+
+ petid | userid | petname  | pettype | picture | status 
+-------+--------+----------+---------+---------+--------
+     1 | user0  | Dog0     |       1 | no      | ACTIVE
+     2 | user0  | Dog1     |       1 | no      | ACTIVE
+     3 | user0  | Dog2     |       1 | no      | ACTIVE
+     4 | user0  | Dog3     |       1 | no      | ACTIVE
+     5 | user0  | Dog4     |       1 | no      | ACTIVE
+     6 | user0  | Cat0     |       2 | no      | ACTIVE
+     7 | user0  | Cat1     |       2 | no      | ACTIVE
+     8 | user0  | Cat2     |       2 | no      | ACTIVE
+     9 | user0  | Cat3     |       2 | no      | ACTIVE
+    10 | user0  | Cat4     |       2 | no      | ACTIVE
+    11 | user0  | Rabbit0  |       4 | no      | ACTIVE
+    12 | user0  | Rabbit1  |       4 | no      | ACTIVE
+    13 | user0  | Rabbit2  |       4 | no      | ACTIVE
+    14 | user0  | Rabbit3  |       4 | no      | ACTIVE
+    15 | user0  | Rabbit4  |       4 | no      | ACTIVE
+    16 | user0  | Bird0    |       3 | no      | ACTIVE
+    17 | user0  | Bird1    |       3 | no      | ACTIVE
+    18 | user0  | Bird2    |       3 | no      | ACTIVE
+    19 | user0  | Bird3    |       3 | no      | ACTIVE
+    20 | user0  | Bird4    |       3 | no      | ACTIVE
+    21 | user0  | Hamster0 |       5 | no      | ACTIVE
+    22 | user0  | Hamster1 |       5 | no      | ACTIVE
+    23 | user0  | Hamster2 |       5 | no      | ACTIVE
+    24 | user0  | Hamster3 |       5 | no      | ACTIVE
+    25 | user0  | Hamster4 |       5 | no      | ACTIVE
+(25 rows)
+
+ buyerid | petid | sellerid | serviceid | amount | winner 
+---------+-------+----------+-----------+--------+--------
+(0 rows)
+
